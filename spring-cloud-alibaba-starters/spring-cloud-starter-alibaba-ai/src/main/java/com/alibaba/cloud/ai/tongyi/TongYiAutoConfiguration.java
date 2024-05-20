@@ -64,7 +64,6 @@ import org.springframework.context.annotation.Bean;
 		TongYiImagesProperties.class,
 		TongYiAudioSpeechProperties.class,
 		TongYiConnectionProperties.class,
-		TongYiConnectionProperties.class,
 		TongYiTextEmbeddingProperties.class
 })
 public class TongYiAutoConfiguration {
