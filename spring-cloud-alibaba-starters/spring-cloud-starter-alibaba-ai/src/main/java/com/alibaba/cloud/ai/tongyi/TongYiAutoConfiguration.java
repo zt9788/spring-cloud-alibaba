@@ -45,6 +45,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 
 /**
  * @author yuluo
@@ -69,6 +70,7 @@ import org.springframework.context.annotation.Bean;
 public class TongYiAutoConfiguration {
 
 	@Bean
+	@Scope("prototype")
 	@ConditionalOnMissingBean
 	public Generation generation() {
 
@@ -76,6 +78,7 @@ public class TongYiAutoConfiguration {
 	}
 
 	@Bean
+	@Scope("prototype")
 	@ConditionalOnMissingBean
 	public MessageManager msgManager() {
 
@@ -83,6 +86,7 @@ public class TongYiAutoConfiguration {
 	}
 
 	@Bean
+	@Scope("prototype")
 	@ConditionalOnMissingBean
 	public ImageSynthesis imageSynthesis() {
 
@@ -90,6 +94,7 @@ public class TongYiAutoConfiguration {
 	}
 
 	@Bean
+	@Scope("prototype")
 	@ConditionalOnMissingBean
 	public SpeechSynthesizer speechSynthesizer() {
 
