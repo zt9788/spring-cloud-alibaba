@@ -18,8 +18,10 @@ package com.alibaba.cloud.ai.tongyi;
 
 import java.util.Objects;
 
-import com.alibaba.cloud.ai.tongyi.audio.TongYiAudioSpeechClient;
-import com.alibaba.cloud.ai.tongyi.audio.TongYiAudioSpeechProperties;
+import com.alibaba.cloud.ai.tongyi.audio.speech.TongYiAudioSpeechClient;
+import com.alibaba.cloud.ai.tongyi.audio.speech.TongYiAudioSpeechProperties;
+import com.alibaba.cloud.ai.tongyi.audio.transcription.TongYiAudioTranscriptionClient;
+import com.alibaba.cloud.ai.tongyi.audio.transcription.TongYiAudioTranscriptionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatClient;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatProperties;
 import com.alibaba.cloud.ai.tongyi.constants.TongYiConstants;
@@ -30,6 +32,7 @@ import com.alibaba.cloud.ai.tongyi.image.TongYiImagesClient;
 import com.alibaba.cloud.ai.tongyi.image.TongYiImagesProperties;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
+import com.alibaba.dashscope.audio.asr.transcription.Transcription;
 import com.alibaba.dashscope.audio.tts.SpeechSynthesizer;
 import com.alibaba.dashscope.common.MessageManager;
 import com.alibaba.dashscope.embeddings.TextEmbedding;
@@ -58,14 +61,16 @@ import org.springframework.context.annotation.Scope;
 		MessageManager.class,
 		TongYiChatClient.class,
 		TongYiImagesClient.class,
-		TongYiAudioSpeechClient.class
+		TongYiAudioSpeechClient.class,
+		TongYiAudioTranscriptionClient.class
 })
 @EnableConfigurationProperties({
 		TongYiChatProperties.class,
 		TongYiImagesProperties.class,
 		TongYiAudioSpeechProperties.class,
 		TongYiConnectionProperties.class,
-		TongYiTextEmbeddingProperties.class
+		TongYiTextEmbeddingProperties.class,
+		TongYiAudioTranscriptionProperties.class
 })
 public class TongYiAutoConfiguration {
 
@@ -99,6 +104,13 @@ public class TongYiAutoConfiguration {
 	public SpeechSynthesizer speechSynthesizer() {
 
 		return new SpeechSynthesizer();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public Transcription transcription() {
+
+		return new Transcription();
 	}
 
 	@Bean
@@ -173,19 +185,37 @@ public class TongYiAutoConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(
-			prefix = TongYiAudioSpeechProperties.CONFIG_PREFIX,
+			prefix = TongYiAudioTranscriptionProperties.CONFIG_PREFIX,
+			name = "enabled",
+			havingValue = "true",
+			matchIfMissing = true
+	)
+	public TongYiAudioTranscriptionClient tongYiAudioTranscriptionClient(
+			Transcription transcription,
+			TongYiAudioTranscriptionProperties transcriptionProperties,
+			TongYiConnectionProperties connectionProperties) {
+
+		settingApiKey(connectionProperties);
+
+		return new TongYiAudioTranscriptionClient(
+				transcriptionProperties.getOptions(),
+				transcription
+		);
+	}
+
+	@Bean
+	@ConditionalOnProperty(
+			prefix = TongYiTextEmbeddingProperties.CONFIG_PREFIX,
 			name = "enabled",
 			havingValue = "true",
 			matchIfMissing = true
 	)
 	public TongYiTextEmbeddingClient tongYiTextEmbeddingClient(
 			TextEmbedding textEmbedding,
-			TongYiTextEmbeddingProperties textEmbeddingProperties,
 			TongYiConnectionProperties connectionProperties
 	) {
 
 		settingApiKey(connectionProperties);
-
 		return new TongYiTextEmbeddingClient(textEmbedding);
 	}
 
